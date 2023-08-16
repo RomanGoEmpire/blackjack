@@ -283,14 +283,18 @@ def play_dealer_hand(dealer_hand):
 
 def decide_winner(hand, final_hand_dealer):
     global BANKROLL
+    global WINS
+    global TOTAL_HANDS
     # player busts
     if get_value_of_hand(hand) > 21:
         # print("Player busts")
         BANKROLL -= BET
+        TOTAL_HANDS += 1
         BANKROLL_HISTORY.append(BANKROLL)
         return "Dealer"
     # if both have the same value then no one wins
     if get_value_of_hand(hand) == get_value_of_hand(final_hand_dealer):
+        TOTAL_HANDS += 1
         # print("Push")
         return "Push"
     # player has higher value than dealer or dealer busts
@@ -299,17 +303,22 @@ def decide_winner(hand, final_hand_dealer):
         if player_has_blackjack(hand) and has_two_cards(hand):
             # print("Player has blackjack")
             BANKROLL += BET * 1.5
+            WINS += 1
+            TOTAL_HANDS += 1
             BANKROLL_HISTORY.append(BANKROLL)
         # Normal payout
         else:
             # print("Player wins")
             BANKROLL += BET
+            WINS += 1
+            TOTAL_HANDS += 1
             BANKROLL_HISTORY.append(BANKROLL)
         return "Player"
     # dealer has higher value than player
     else:
         # print("Dealer wins")
         BANKROLL -= BET
+        TOTAL_HANDS += 1
         BANKROLL_HISTORY.append(BANKROLL)
         return "Dealer"
 
@@ -322,12 +331,16 @@ BET = 1
 HANDS = 1
 COUNT = 0
 TRUE_COUNT = 0
+WINS = 0
+TOTAL_HANDS = 0
 
 
 def get_splitted_winner(hand, final_hand_dealer):
     global BANKROLL
+    global TOTAL_HANDS
     if hand is None:
         BANKROLL -= BET / 2
+        TOTAL_HANDS += 1
         BANKROLL_HISTORY.append(BANKROLL)
         # print("Surrender")
         return
@@ -348,6 +361,7 @@ def play_round(amount):
     global HANDS
     global COUNT
     global TRUE_COUNT
+    global TOTAL_HANDS
 
     for i in range(amount):
         # print(f'bet: {bet}')
@@ -374,6 +388,8 @@ def play_round(amount):
 
         if final_hand_player is None:
             BANKROLL -= BET / 2
+            TOTAL_HANDS += 1
+            BANKROLL_HISTORY.append(BANKROLL)
             # print("Surrender")
             continue
 
@@ -414,3 +430,4 @@ if __name__ == '__main__':
     plot_history(BANKROLL_HISTORY)
     print(f"rounds: {ROUNDS}")
     print(f"average loss per round: {INITIAL_BANKROLL / ROUNDS}")
+    print(f"win rate: {WINS / TOTAL_HANDS}")
